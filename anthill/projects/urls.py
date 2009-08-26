@@ -3,9 +3,8 @@ from anthill.projects.feeds import ProjectFeed, AskFeed
 
 urlpatterns = patterns('',
     url(r'^feeds/(?P<url>.*)/$', 'django.contrib.syndication.views.feed',
-        {'feed_dict': {'latest': ProjectFeed}}, name='project_feeds'),
-    url(r'^asks/(?P<url>.*)/$', 'django.contrib.syndication.views.feed',
-        {'feed_dict': {'latest': AskFeed}}, name='ask_feed'),
+        {'feed_dict': {'latest': ProjectFeed, 'asks': AskFeed}},
+        name='project_feeds'),
 )
 
 urlpatterns += patterns('anthill.projects.views',
