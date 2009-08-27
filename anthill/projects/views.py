@@ -21,7 +21,7 @@ def projects_and_ideas(request):
                               context_instance=RequestContext(request))
 
 def archive(request, projects='all'):
-    qs = Project.objects.select_related().all()
+    qs = Project.objects.select_related().order_by('-update_date')
     if projects == 'official':
         qs = qs.filter(official=True)
     elif projects == 'community':
