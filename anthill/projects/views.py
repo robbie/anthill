@@ -20,21 +20,17 @@ def projects_and_ideas(request):
     return render_to_response('projects/projects_and_ideas.html', context,
                               context_instance=RequestContext(request))
 
-def archive(request):
+def archive(request, projects='all'):
     qs = Project.objects.select_related().all()
+    if projects == 'official':
+        qs = qs.filter(official=True)
+    elif projects == 'community':
+        qs = qs.filter(official=False)
     if hasattr(qs, '_gatekeeper'):
         qs = qs.approved()
     return object_list(request, queryset=qs,
                        template_object_name='project', allow_empty=True,
-                       paginate_by=10)
-
-def official_projects(request):
-    qs = Project.objects.select_related().filter(official=True)
-    if hasattr(qs, '_gatekeeper'):
-        qs = qs.approved()
-    return object_list(request, queryset=qs,
-                       template_object_name='project', allow_empty=True,
-                       extra_context={'official':True}, paginate_by=10)
+                       extra_context={'projects':projects}, paginate_by=10)
 
 def tag_archive(request, tag):
     qs = Project.objects.select_related()
