@@ -19,6 +19,14 @@ class SearchForm(forms.Form):
     location_range = forms.ChoiceField(choices=DISTANCE_CHOICES, initial='50',
                                        required=False)
 
+    def clean(self):
+        cleaned_data = self.cleaned_data
+        if not (cleaned_data['location'] or cleaned_data['skills'] or
+                cleaned_data['name'] or cleaned_data['position']):
+            raise forms.ValidationError("No search parameters specified")
+        return cleaned_data
+
+
 class ProfileForm(forms.Form):
     name = forms.CharField(label='Name', required=False)
     email = forms.CharField(label='Email')
