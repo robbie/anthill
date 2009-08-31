@@ -99,6 +99,11 @@ def change_password(request):
 def contact(request, username):
     to_user = get_object_or_404(User, username=username)
 
+    if not request.user.profile.can_send_email():
+        request.user.message_set.create(message='You have temporarily exceeded the email quota.  Please wait a few minutes before sending this email.')
+    elif request.method == 'POST':
+        request.user.profile.record_email_sent()
+
     if not request.user.email:
         request.user.message_set.create(message='You must set a valid email address prior to emailing other users.')
         return redirect('edit_profile')

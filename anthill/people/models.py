@@ -1,3 +1,4 @@
+import datetime
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -13,6 +14,9 @@ ROLES = (
     ('both', 'Developer/Designer'),
 )
 
+MESSAGE_WAIT_PERIOD = 2
+MAX_MESSAGES = 100
+
 class Profile(LocationModel):
     user = models.OneToOneField(User, related_name='profile')
     url = models.URLField(blank=True)
@@ -21,10 +25,27 @@ class Profile(LocationModel):
     twitter_id = models.CharField(max_length=15, blank=True)
     skills = TagField('comma separated list of your skills (eg. python, django)')
 
+    # other metadata
     allow_org_emails = models.BooleanField(default=False)
+    signup_date = models.DateTimeField(auto_now_add=True)
+    last_email_sent = models.DateTimeField(null=True)
+    num_emails_sent = models.IntegerField(default=0)
 
     def __unicode__(self):
         return unicode(self.user)
+
+    def can_send_email(self):
+        if self.last_email_sent:
+            elapsed = datetime.datetime.now() - self.last_email_sent
+        else:
+            elapsed = datetime.timedelta(minutes=MESSAGE_WAIT_PERIOD+1)
+        return (elapsed > datetime.timedelta(minutes=MESSAGE_WAIT_PERIOD) and
+                self.num_emails_sent < MAX_MESSAGES)
+
+    def record_email_sent(self):
+        self.last_email_sent = datetime.datetime.now()
+        self.num_emails_sent += 1
+        self.save()
 
 def create_profile(sender, instance, created, **kwargs):
     if created:
