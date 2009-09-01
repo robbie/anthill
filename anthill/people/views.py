@@ -99,20 +99,20 @@ def change_password(request):
 def contact(request, username):
     to_user = get_object_or_404(User, username=username)
 
-    if not request.user.profile.can_send_email():
-        request.user.message_set.create(message='You have temporarily exceeded the email quota.  Please wait a few minutes before sending this email.')
-    elif request.method == 'POST':
-        request.user.profile.record_email_sent()
-
+    # only users with a valid email can send email
     if not request.user.email:
         request.user.message_set.create(message='You must set a valid email address prior to emailing other users.')
         return redirect('edit_profile')
+
+    # if this user can't send email inform them of the fact
+    if not request.user.profile.can_send_email():
+        request.user.message_set.create(message='You have currently exceeded the message quota.  Please wait a few minutes before sending this message.')
 
     if request.method == 'GET':
         form = UserContactForm()
     else:
         form = UserContactForm(request.POST)
-        if form.is_valid():
+        if form.is_valid() and request.user.profile.can_send_email():
             data = {'from_user': request.user, 'to_user': to_user,
                     'subject': form.cleaned_data['subject'],
                     'body': form.cleaned_data['body']}
@@ -120,6 +120,7 @@ def contact(request, username):
             body = render_to_string('people/contact_email_body.txt', data)
             to_user.email_user(subject.strip(), body, request.user.email)
             request.user.message_set.create(message='Your email has been delivered to %s' % (to_user.first_name or to_user.username))
+            request.user.profile.record_email_sent()
             return redirect('user_profile', username)
 
     return render_to_response('people/contact.html',

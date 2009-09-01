@@ -15,7 +15,7 @@ ROLES = (
 )
 
 MESSAGE_WAIT_PERIOD = 2
-MAX_MESSAGES = 100
+INITIAL_MAX_MESSAGES = 100
 
 class Profile(LocationModel):
     user = models.OneToOneField(User, related_name='profile')
@@ -30,6 +30,7 @@ class Profile(LocationModel):
     signup_date = models.DateTimeField(auto_now_add=True)
     last_email_sent = models.DateTimeField(null=True)
     num_emails_sent = models.IntegerField(default=0)
+    allowed_emails = models.IntegerField(default=INITIAL_MAX_MESSAGES)
 
     def __unicode__(self):
         return unicode(self.user)
@@ -40,7 +41,7 @@ class Profile(LocationModel):
         else:
             elapsed = datetime.timedelta(minutes=MESSAGE_WAIT_PERIOD+1)
         return (elapsed > datetime.timedelta(minutes=MESSAGE_WAIT_PERIOD) and
-                self.num_emails_sent < MAX_MESSAGES)
+                self.num_emails_sent < self.allowed_emails)
 
     def record_email_sent(self):
         self.last_email_sent = datetime.datetime.now()
