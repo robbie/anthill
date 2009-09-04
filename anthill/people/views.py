@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from anthill.people.models import Profile
 from anthill.people.forms import SearchForm, ProfileForm, PasswordForm, UserContactForm
+from anthill.people.signals import message_sent
 
 def search(request):
     context = { 'form': SearchForm() }
@@ -118,6 +119,8 @@ def contact(request, username):
                     'body': form.cleaned_data['body']}
             subject = render_to_string('people/contact_email_subject.txt', data)
             body = render_to_string('people/contact_email_body.txt', data)
+            message_sent.send(sender=request.user, subject=subject, body=body,
+                              recipient=to_user)
             to_user.email_user(subject.strip(), body, request.user.email)
             request.user.message_set.create(message='Your email has been delivered to %s' % (to_user.first_name or to_user.username))
             request.user.profile.record_email_sent()
