@@ -1,5 +1,10 @@
 from django.contrib.gis import admin
-from anthill.events.models import Event
+from anthill.events.models import Event, Attendance
 
-admin.site.register(Event, admin.OSMGeoAdmin)
+class AttendanceInline(admin.TabularInline):
+    model = Attendance
 
+class EventAdmin(admin.OSMGeoAdmin):
+    inlines = [AttendanceInline,]
+
+admin.site.register(Event, EventAdmin)
