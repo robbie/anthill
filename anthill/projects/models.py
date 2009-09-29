@@ -39,12 +39,19 @@ ROLE_STATUSES = (
     ('R', 'Retired')
 )
 
+class RoleManager(models.Manager):
+
+    def active(self):
+        return self.filter(status='A')
+
 class Role(models.Model):
     user = models.ForeignKey(User, related_name='project_roles')
     project = models.ForeignKey(Project, related_name='roles')
     join_time = models.DateField(auto_now_add=True)
     status = models.CharField(choices=ROLE_STATUSES, max_length=1, default='P')
     message = models.TextField(blank=True)
+
+    objects = RoleManager()
 
 SITE_LINK, SOURCE_LINK, DOCS_LINK, DOWNLOAD_LINK, EMAIL_LINK = range(5)
 LINK_TYPES = (
