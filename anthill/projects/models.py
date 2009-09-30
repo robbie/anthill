@@ -65,7 +65,7 @@ LINK_TYPES = (
 class Link(models.Model):
     name = models.CharField(max_length=100)
     url = models.URLField()
-    link_type = models.PositiveSmallIntegerField(choices=LINK_TYPES)
+    link_type = models.PositiveSmallIntegerField(choices=LINK_TYPES, default=SITE_LINK)
 
     project = models.ForeignKey(Project, related_name='links')
 
