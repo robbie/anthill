@@ -1,3 +1,4 @@
+import datetime
 from django import forms
 from anthill.events.models import Event
 
@@ -19,13 +20,25 @@ class SplitDateTimeListWidget(forms.widgets.SplitDateTimeWidget):
         return '<li><label>Date</label>%s</li><li><label>Time</label>%s</li>' % (rendered_widgets[0],
                                                                                  rendered_widgets[1])
 
+class SplitDateOptionalTimeField(forms.SplitDateTimeField):
+    def compress(self, data_list):
+        if data_list:
+            # Raise a validation error if time or date is empty
+            # (possible if SplitDateTimeField has required=False).
+            if data_list[0] in (None, ''):
+                raise ValidationError(self.error_messages['invalid_date'])
+            if data_list[1] in (None, ''):
+                data_list[1] = datetime.time()  # use default time
+            return datetime.datetime.combine(*data_list)
+        return None
+
 class EventForm(forms.ModelForm):
     class Meta:
         model = Event
         fields = ['title', 'description', 'location', 'url', 'start_date', 'end_date']
     location = forms.CharField(label='Address')
-    start_date = forms.SplitDateTimeField(widget=SplitDateTimeListWidget, required=False)
-    end_date = forms.SplitDateTimeField(widget=SplitDateTimeListWidget, required=False)
+    start_date = SplitDateOptionalTimeField(widget=SplitDateTimeListWidget, required=False)
+    end_date = SplitDateOptionalTimeField(widget=SplitDateTimeListWidget, required=False)
 
 class AttendForm(forms.Form):
     guests = forms.IntegerField('Additional Guests',
