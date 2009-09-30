@@ -26,7 +26,7 @@ class Event(LocationModel):
     objects = EventManager()
 
     class Meta:
-        ordering = ['-start_date']
+        ordering = ['start_date']
 
     def __unicode__(self):
         return self.title
