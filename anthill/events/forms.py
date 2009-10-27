@@ -35,7 +35,8 @@ class SplitDateOptionalTimeField(forms.SplitDateTimeField):
 class EventForm(forms.ModelForm):
     class Meta:
         model = Event
-        fields = ['title', 'description', 'location', 'url', 'start_date', 'end_date']
+        fields = ['title', 'description', 'location', 'url', 'start_date', 'end_date', 'related_projects']
+
     location = forms.CharField(label='Address')
     start_date = SplitDateOptionalTimeField(widget=SplitDateTimeListWidget, required=False)
     end_date = SplitDateOptionalTimeField(widget=SplitDateTimeListWidget, required=False)

@@ -5,6 +5,7 @@ from django.db import models
 from django.db.models import Q
 from django.conf import settings
 from anthill.models import LocationModel, LocationModelManager
+from anthill.projects.models import Project
 from markupfield.fields import MarkupField
 
 class EventManager(LocationModelManager):
@@ -22,6 +23,7 @@ class Event(LocationModel):
     end_date = models.DateTimeField(null=True, blank=True)
     creator = models.ForeignKey(User, related_name='events_created')
     attendees = models.ManyToManyField(User, through='Attendance', related_name='events_attended')
+    related_projects = models.ManyToManyField(Project, related_name='related_events')
 
     objects = EventManager()
 
