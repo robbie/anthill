@@ -1,0 +1,14 @@
+=================
+anthill changelog
+=================
+
+0.2.0 -
+======================
+    - set default link_type on project links
+    - fix event default ordering
+    - improvements to internal messaging system including message_sent signal
+    - improvements to Event including optional times and related_projects
+
+0.1.0 - August 31 2009
+=======================
+    - initial working release
