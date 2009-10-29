@@ -76,6 +76,7 @@ def new_event(request):
             event = form.save(commit=False)
             event.creator = request.user
             event.save()
+            form.save_m2m()
             return redirect(event.get_absolute_url())
     else:
         form = EventForm()
